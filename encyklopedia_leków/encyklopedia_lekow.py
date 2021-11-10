@@ -3,6 +3,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 import re
+import csv
 
 def fetch_url(homepage):
     html_file = urllib.request.urlopen(homepage)
@@ -10,6 +11,7 @@ def fetch_url(homepage):
     #print(soup.prettify())
 
     return soup
+
 
 def find_links(soup):
     medicines = []
@@ -31,41 +33,53 @@ def find_links(soup):
         index += 1
 
     return medicines
-    #for link in soup.find_all('a'):
-    #    print(link.get('href'))
+
+
 
 def print_medicines(list_od_medicines):
     for med in list_od_medicines:
         print(med)
 
-def open_medicines(list_of_medicines):
+
+
+def open_medicines(list_of_medicines, writer):
     for link in list_of_medicines:
         html_file = urllib.request.urlopen(link)
         soup = BeautifulSoup(html_file, 'html.parser')
         #print(soup.prettify())
         title = soup.title.string
         noticed = False
+        result_row = ["", "", ""]
         for para in soup.find_all('h3'): #h3
             #print(para.get_text())
             strigified = para.get_text()
             if re.search("nterakcj", strigified) != None:
                 if not noticed:
                     title_list = title.split()[:2]
-                    proper_title = " ".join(title_list)
                     noticed = True
-                    print(proper_title)
+                    result_row[0] = title_list[0]
+                    result_row[1] = title_list[1]
+                    print(title_list)
                 #print(para.next_sibling.get_text())
                 next = para.find_next('p')
-                print(next.get_text())
+                next_text = next.get_text()
+                result_row[2] += next_text + '\n'
+                print(next_text)
+
+                writer.writerow(result_row)
         print('\n\n')
 
-# Press the green button in the gutter to run the script.
+
+
 if __name__ == '__main__':
     url = 'https://www.doz.pl/leki/strona/1'
     soup = fetch_url(url)
     medicines = find_links(soup)
     #print_medicines(medicines)
-    open_medicines(medicines)
+    with open("leki.csv", "w", newline='') as csfile:
+        writer = csv.writer(csfile)
+        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje"])
+        open_medicines(medicines, writer)
    # print(response)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
