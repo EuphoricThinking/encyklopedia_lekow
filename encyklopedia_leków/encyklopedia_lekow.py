@@ -55,9 +55,7 @@ def open_medicines(list_of_medicines, writer):
         for para in soup.find_all('h3'): #h3
             #print(para.get_text())
             strigified = para.get_text()
-            print("before")
             if re.search("nterakcj", strigified) != None:
-                print("after")
                 if not noticed:
                     title_list = title.split()[:2]
                     noticed = True
@@ -83,7 +81,7 @@ if __name__ == '__main__':
     #soup = fetch_url(url)
     #medicines = find_links(soup)
     #print_medicines(medicines)
-    with open("lekiBig2.csv", "w", newline='') as csfile:
+    with open("lekiBig3.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
         writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje"])
         for page in range (1, 90):
