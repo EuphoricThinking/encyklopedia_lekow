@@ -1,7 +1,5 @@
-# This is a sample Python script.
+# http://leki.urpl.gov.pl/index.php?id=%27%%27
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import urllib.request
 from bs4 import BeautifulSoup
 import re
@@ -29,7 +27,7 @@ def find_links(soup):
     index += 2
 
     while (set_of_links[index] != '#' and re.match("/leki/strona/", set_of_links[index]) == None):
-        medicines.append(set_of_links[index])
+        medicines.append('https://www.doz.pl/' + set_of_links[index])
         index += 1
 
     return medicines
@@ -39,12 +37,28 @@ def find_links(soup):
 def print_medicines(list_od_medicines):
     for med in list_od_medicines:
         print(med)
+
+def open_medicines(list_of_medicines):
+    for link in list_of_medicines:
+        html_file = urllib.request.urlopen(link)
+        soup = BeautifulSoup(html_file, 'html.parser')
+        #print(soup.prettify())
+        for para in soup.find_all('h3'): #h3
+            #print(para.get_text())
+            strigified = para.get_text()
+            if re.search("nterakcj", strigified) != None:
+                next = para.find_next('p')
+                #print(para.next_sibling.get_text())
+                print(next.get_text())
+        print('\n\n')
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     url = 'https://www.doz.pl/leki/strona/1'
     soup = fetch_url(url)
     medicines = find_links(soup)
-    print_medicines(medicines)
+    #print_medicines(medicines)
+    open_medicines(medicines)
    # print(response)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
