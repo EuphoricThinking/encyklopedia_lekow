@@ -1,6 +1,7 @@
 # http://leki.urpl.gov.pl/index.php?id=%27%%27
 
 import urllib.request
+from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 import re
 import csv
@@ -45,34 +46,41 @@ def print_medicines(list_od_medicines):
 def open_medicines(list_of_medicines, writer):
     for link in list_of_medicines:
         print(link)
-        html_file = urllib.request.urlopen(link)
-        soup = BeautifulSoup(html_file, 'html.parser')
-        #print(soup.prettify())
-        title = soup.title.string
-        noticed = False
-        result_row = ["", "", ""]
-        previous = ""
-        for para in soup.find_all('h3'): #h3
-            #print(para.get_text())
-            strigified = para.get_text()
-            if re.search("nterakcj", strigified) != None:
-                if not noticed:
-                    title_list = title.split()[:2]
-                    noticed = True
-                    result_row[0] = title_list[0]
-                    result_row[1] = title_list[1]
-                    print(title_list)
-                #print(para.next_sibling.get_text())
-                next = para.find_next('p')
-                next_text = next.get_text()
-                if next_text != previous:
-                    result_row[2] += next_text + '\n'
-                    previous = next_text
-                print(next_text)
+        try :
+            html_file = urllib.request.urlopen(link)
+            soup = BeautifulSoup(html_file, 'html.parser')
+            #print(soup.prettify())
+            title = soup.title.string
+            noticed = False
+            result_row = ["", "", ""]
+            previous = ""
+            for para in soup.find_all('h3'): #h3
+                #print(para.get_text())
+                strigified = para.get_text()
+                if re.search("nterakcj", strigified) != None:
+                    if not noticed:
+                        title_list = title.split()[:2]
+                        noticed = True
+                        result_row[0] = title_list[0]
+                        result_row[1] = title_list[1]
+                        print(title_list)
+                    #print(para.next_sibling.get_text())
+                    next = para.find_next('p')
+                    next_text = next.get_text()
+                    if next_text != previous:
+                        result_row[2] += next_text + '\n'
+                        previous = next_text
+                    print(next_text)
 
-        if noticed:
-            writer.writerow(result_row)
-        print('\n\n')
+            if noticed:
+                writer.writerow(result_row)
+            print('\n\n')
+        except HTTPError as err:
+            if err.code == 404:
+                pass
+            else:
+                raise
+
 
 
 
@@ -81,7 +89,7 @@ if __name__ == '__main__':
     #soup = fetch_url(url)
     #medicines = find_links(soup)
     #print_medicines(medicines)
-    with open("lekiBig3.csv", "w", newline='') as csfile:
+    with open("lekiBigCatch.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
         writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje"])
         for page in range (1, 90):
