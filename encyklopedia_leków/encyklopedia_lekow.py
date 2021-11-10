@@ -44,16 +44,20 @@ def print_medicines(list_od_medicines):
 
 def open_medicines(list_of_medicines, writer):
     for link in list_of_medicines:
+        print(link)
         html_file = urllib.request.urlopen(link)
         soup = BeautifulSoup(html_file, 'html.parser')
         #print(soup.prettify())
         title = soup.title.string
         noticed = False
         result_row = ["", "", ""]
+        previous = ""
         for para in soup.find_all('h3'): #h3
             #print(para.get_text())
             strigified = para.get_text()
+            print("before")
             if re.search("nterakcj", strigified) != None:
+                print("after")
                 if not noticed:
                     title_list = title.split()[:2]
                     noticed = True
@@ -63,23 +67,30 @@ def open_medicines(list_of_medicines, writer):
                 #print(para.next_sibling.get_text())
                 next = para.find_next('p')
                 next_text = next.get_text()
-                result_row[2] += next_text + '\n'
+                if next_text != previous:
+                    result_row[2] += next_text + '\n'
+                    previous = next_text
                 print(next_text)
 
-                writer.writerow(result_row)
+        if noticed:
+            writer.writerow(result_row)
         print('\n\n')
 
 
 
 if __name__ == '__main__':
-    url = 'https://www.doz.pl/leki/strona/1'
-    soup = fetch_url(url)
-    medicines = find_links(soup)
+    url = 'https://www.doz.pl/leki/strona/' #1
+    #soup = fetch_url(url)
+    #medicines = find_links(soup)
     #print_medicines(medicines)
-    with open("leki.csv", "w", newline='') as csfile:
+    with open("lekiBig2.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
         writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje"])
-        open_medicines(medicines, writer)
+        for page in range (1, 90):
+            new_page = url + str(page)
+            soup = fetch_url(new_page)
+            medicines = find_links(soup)
+            open_medicines(medicines, writer)
    # print(response)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
