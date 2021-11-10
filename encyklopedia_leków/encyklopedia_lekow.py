@@ -43,12 +43,19 @@ def open_medicines(list_of_medicines):
         html_file = urllib.request.urlopen(link)
         soup = BeautifulSoup(html_file, 'html.parser')
         #print(soup.prettify())
+        title = soup.title.string
+        noticed = False
         for para in soup.find_all('h3'): #h3
             #print(para.get_text())
             strigified = para.get_text()
             if re.search("nterakcj", strigified) != None:
-                next = para.find_next('p')
+                if not noticed:
+                    title_list = title.split()[:2]
+                    proper_title = " ".join(title_list)
+                    noticed = True
+                    print(proper_title)
                 #print(para.next_sibling.get_text())
+                next = para.find_next('p')
                 print(next.get_text())
         print('\n\n')
 
