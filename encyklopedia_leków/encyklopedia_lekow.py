@@ -52,7 +52,7 @@ def open_medicines(list_of_medicines, writer):
             #print(soup.prettify())
             title = soup.title.string
             noticed = False
-            result_row = ["", "", ""]
+            result_row = ["", "", "", link]
             previous = ""
             for para in soup.find_all('h3'): #h3
                 #print(para.get_text())
@@ -74,6 +74,8 @@ def open_medicines(list_of_medicines, writer):
 
             if noticed:
                 writer.writerow(result_row)
+                print(result_row)
+                print("WRITTEN")
             print('\n\n')
         except HTTPError as err:
             if err.code == 404:
@@ -91,7 +93,7 @@ if __name__ == '__main__':
     #print_medicines(medicines)
     with open("lekiBigCatch.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
-        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje"])
+        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje", "Strona"])
         for page in range (1, 90):
             new_page = url + str(page)
             soup = fetch_url(new_page)
