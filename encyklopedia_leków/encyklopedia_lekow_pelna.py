@@ -88,9 +88,20 @@ def open_medicines(list_of_medicines, writer):
                         print(res_string)
                         result_row.append(res_string)
 
-                for indications in soup.find_all('button'):
-                    stringified_button = indications.get_text()
-                    print(stringified_button)
+                # for indications in soup.find_all('button'):
+                #     stringified_button = indications.get_text()
+                #     print(stringified_button, " button")
+
+                for ind in soup.find_all('h3'):
+                    stringified_ind = ind.get_text()
+                    #print(stringified_ind, " h2")
+                    res = []
+                    if re.search("Wskazania", stringified_ind):
+                        next = ind.find_next('p')
+                        next_text = next.get_text()
+                        result_row.append(next_text)
+                        print(next_text)
+
                 writer.writerow(result_row)
                 print(result_row)
                 print("WRITTEN")
@@ -112,7 +123,7 @@ if __name__ == '__main__':
     #print_medicines(medicines)
     with open("lekiPelne.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
-        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje", "Strona",  "Substancja aktywna"])
+        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje", "Strona",  "Substancja aktywna", "Wskazania"])
         for page in range (1, 90):
             new_page = url + str(page)
             soup = fetch_url(new_page)
