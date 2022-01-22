@@ -37,9 +37,14 @@ def create_list_for_table_with_duplicates(csfile, col1, col2):
 
     return doubled
 
+def save_csv(result, name):
+    with open(name + ".csv", 'w') as opcsv:
+        writer = csv.writer(opcsv)
+        writer.writerows(result)
 
 if __name__ == '__main__':
     first, second, begin, path, name = parse_args()
     res = open_csv(path, begin)
     result = create_list_for_table_with_duplicates(res, first, second)
     print(result)
+    save_csv(result, name)
