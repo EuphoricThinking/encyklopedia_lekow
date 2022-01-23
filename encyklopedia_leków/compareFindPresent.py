@@ -1,6 +1,11 @@
 import argparse
 import csv
 
+"""
+    Compares according two files according to the value in the first column of each row and chooses the vrows from the second table.
+    Then proceeds addition and multiplication as in normal dispatcher
+"""
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("firstCol", help = "Number of the first column to match", type=int)
