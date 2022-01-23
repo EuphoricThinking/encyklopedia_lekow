@@ -102,6 +102,20 @@ def open_medicines(list_of_medicines, writer):
                         result_row.append(next_text)
                         print(next_text)
 
+                for ind2 in soup.find_all('dt'):
+                    stringified_ind2 = ind2.get_text()
+                    #print(stringified_ind2, "ind2")
+                    if re.search("Działanie", stringified_ind2):
+                        next = ind2.find_next('div')
+                        next_text = next.get_text()
+                        splitted = next_text.split('  ')
+                        # print(splitted)
+                        res_splitted = [el for el in splitted if el != '' and el != '\n']
+                        print(res_splitted)
+                        res_string = " ".join(res_splitted)
+                        print(res_string)
+                        result_row.append(res_string)
+
                 writer.writerow(result_row)
                 print(result_row)
                 print("WRITTEN")
@@ -123,7 +137,7 @@ if __name__ == '__main__':
     #print_medicines(medicines)
     with open("lekiPelne.csv", "w", newline='') as csfile:
         writer = csv.writer(csfile)
-        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje", "Strona",  "Substancja aktywna", "Wskazania"])
+        writer.writerow(["Polska nazwa", "Angielska nazwa", "Interakcje", "Strona",  "Substancja aktywna", "Wskazania", "Działanie"])
         for page in range (1, 90):
             new_page = url + str(page)
             soup = fetch_url(new_page)
